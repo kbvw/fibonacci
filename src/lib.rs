@@ -8,16 +8,16 @@ mod fibonacci {
 
     /// Iterator generating the n-th Fibonacci number
     #[pyclass]
-    struct Fibonacci {
+    pub struct Fibonacci {
         curr: usize,
-        next: Option<usize>,
+        pub next: Option<usize>,
     }
 
     #[pymethods]
     impl Fibonacci {
         #[new]
         #[pyo3(signature = (start=0))]
-        fn new(start: usize) -> PyResult<Self> {
+        pub fn new(start: usize) -> PyResult<Self> {
             let mut elem = Fibonacci {
                 curr: 0,
                 next: Some(1),
@@ -61,5 +61,21 @@ mod fibonacci {
                 None => None,
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::fibonacci::Fibonacci;
+    use super::*;
+
+    #[test]
+    fn test_fibonacci() -> Result<(), PyErr> {
+        assert!(Fibonacci::new(0)?.next.unwrap() == 1);
+        assert!(Fibonacci::new(1)?.next.unwrap() == 1);
+        assert!(Fibonacci::new(2)?.next.unwrap() == 2);
+        assert!(Fibonacci::new(3)?.next.unwrap() == 3);
+        assert!(Fibonacci::new(4)?.next.unwrap() == 5);
+        Ok(())
     }
 }
