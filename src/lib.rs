@@ -16,10 +16,20 @@ mod fibonacci {
     #[pymethods]
     impl Fibonacci {
         #[new]
-        fn new() -> Self {
-            Fibonacci {
+        #[pyo3(signature = (start=0))]
+        fn new(start: usize) -> PyResult<Self> {
+            let mut elem = Fibonacci {
                 curr: 0,
                 next: Some(1),
+            };
+
+            for _ in 0..start {
+                elem.next();
+            }
+
+            match elem.next {
+                Some(_) => Ok(elem),
+                None => Err(PyOverflowError::new_err("Integer overflow")),
             }
         }
 
