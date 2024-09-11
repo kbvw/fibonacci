@@ -9,14 +9,17 @@ mod fibonacci {
     #[pyclass]
     struct Fibonacci {
         curr: usize,
-        next: usize,
+        next: Option<usize>,
     }
 
     #[pymethods]
     impl Fibonacci {
         #[new]
         fn new() -> Self {
-            Fibonacci { curr: 0, next: 1 }
+            Fibonacci {
+                curr: 0,
+                next: Some(1),
+            }
         }
 
         fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
@@ -32,12 +35,17 @@ mod fibonacci {
         type Item = usize;
 
         fn next(&mut self) -> Option<usize> {
-            let next = self.curr + self.next;
+            match self.next {
+                Some(val) => {
+                    let next = self.curr.checked_add(val);
 
-            self.curr = self.next;
-            self.next = next;
+                    self.curr = val;
+                    self.next = next;
 
-            Some(self.curr)
+                    Some(self.curr)
+                }
+                None => None,
+            }
         }
     }
 }
