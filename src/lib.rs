@@ -1,3 +1,4 @@
+use pyo3::exceptions::PyOverflowError;
 use pyo3::prelude::*;
 
 /// Fibonacci module
@@ -26,8 +27,11 @@ mod fibonacci {
             slf
         }
 
-        fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<usize> {
-            slf.next()
+        fn __next__(mut slf: PyRefMut<'_, Self>) -> PyResult<usize> {
+            match slf.next() {
+                Some(val) => Ok(val),
+                None => Err(PyOverflowError::new_err("Integer overflow")),
+            }
         }
     }
 
